@@ -6,6 +6,10 @@ This is the backend part of the Squeak Boutique e-commerce store, built using La
 
 [Demo](https://squeak-boutique.netlify.app/)
 
+Demo Supplier Logins:
+- fancy@ratwear.com, password
+- runway@rodent.com, password
+
 ## Features
 
 -   User authentication with Laravel Sanctum
@@ -31,7 +35,7 @@ This is the backend part of the Squeak Boutique e-commerce store, built using La
 1. Clone the repository:
 
     ```bash
-    git clone git@github.com:taylorivanoff/squeak-boutique-ecommerce-api.git
+    git clone https://github.com/taylorivanoff/squeak-boutique-ecommerce-api.git
     ```
 
 2. Navigate to the backend directory:
