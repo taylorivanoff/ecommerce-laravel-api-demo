@@ -11,7 +11,7 @@ class SupplierOrderController extends Controller
     {
         $user = $request->user();
 
-        $orders = $user->products()
+        $products = $user->products()
             ->with('orders.user')
             ->with([
                 'orders.items' => function ($query) use ($user) {
@@ -21,7 +21,7 @@ class SupplierOrderController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        $orders->each(function ($product) use ($user) {
+        $products->each(function ($product) use ($user) {
             $product->orders->each(function ($order) use ($user) {
                 $order->supplier_amount = $order->items
                     ->sum(function ($item) {
@@ -30,6 +30,6 @@ class SupplierOrderController extends Controller
             });
         });
 
-        return SupplierOrderResource::collection($orders);
+        return SupplierOrderResource::collection($products);
     }
 }
