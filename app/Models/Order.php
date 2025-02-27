@@ -17,6 +17,8 @@ class Order extends Model
         'status',
     ];
 
+    protected $with = ['items'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

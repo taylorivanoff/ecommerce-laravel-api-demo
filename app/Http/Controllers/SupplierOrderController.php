@@ -2,22 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SupplierOrderResource;
 use Illuminate\Http\Request;
 
-class SupplierController extends Controller
+class SupplierOrderController extends Controller
 {
-    public function products(Request $request)
-    {
-        $products = $request->user()->products()->get();
-
-        return response()->json($products, 200);
-    }
-
-    public function orders(Request $request)
+    public function __invoke(Request $request)
     {
         $user = $request->user();
 
-        $products = $user->products()
+        $orders = $user->products()
             ->with('orders.user')
             ->with([
                 'orders.items' => function ($query) use ($user) {
@@ -27,7 +21,7 @@ class SupplierController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        $products->each(function ($product) use ($user) {
+        $orders->each(function ($product) use ($user) {
             $product->orders->each(function ($order) use ($user) {
                 $order->supplier_amount = $order->items
                     ->sum(function ($item) {
@@ -36,7 +30,6 @@ class SupplierController extends Controller
             });
         });
 
-
-        return response()->json($products, 200);
+        return SupplierOrderResource::collection($orders);
     }
 }
