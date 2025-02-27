@@ -56,6 +56,7 @@ This is the backend part of the Squeak Boutique e-commerce store, built using La
 5. Run migrations:
 
     ```bash
+    touch database/database.sqlite
     php artisan migrate --seed
     ```
 
