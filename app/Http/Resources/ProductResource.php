@@ -21,6 +21,12 @@ class ProductResource extends JsonResource
             'price' => $this->price,
             'image_url' => $this->image_url,
             'supplier' => new SupplierResource($this->whenLoaded('supplier')),
+            'order_item' => $this->whenPivotLoaded('order_items', function () {
+                return [
+                    'sold_at_price' => $this->pivot->price,
+                    'quantity' => $this->pivot->quantity,
+                ];
+            }),
         ];
     }
 }

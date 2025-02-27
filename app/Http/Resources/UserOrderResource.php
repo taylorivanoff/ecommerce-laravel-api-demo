@@ -16,10 +16,12 @@ class UserOrderResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'status' => ucwords($this->status),
             'total_amount' => $this->total_amount,
             'payment_method' => $this->payment_method,
             'address' => $this->address,
             'created_at' => $this->created_at,
+            'items' => ProductResource::collection($this->whenLoaded('items'))
         ];
     }
 }

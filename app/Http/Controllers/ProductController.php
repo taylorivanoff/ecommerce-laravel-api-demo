@@ -29,8 +29,8 @@ class ProductController extends Controller
         $validated = $request->validated();
 
         $imagePath = null;
-        if ($validated->hasFile('image')) {
-            $imagePath = $validated->file('image')->store('images', 'public');
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('images', 'public');
         }
 
         $product = Product::create([
@@ -46,17 +46,15 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product): ProductResource
     {
-        $validated = $request->validated();
-
-        if ($validated->hasFile('image')) {
+        if ($request->hasFile('image')) {
             if ($product->image) {
                 Storage::delete($product->image);
             }
 
-            $product->image = $validated->file('image')->store('images', 'public');
+            $product->image = $request->file('image')->store('images', 'public');
         }
 
-        $product->update($validated->only('name', 'price', 'description'));
+        $product->update($request->safe()->only('name', 'price', 'description'));
 
         return new ProductResource($product);
     }
