@@ -23,7 +23,7 @@ class ProductResource extends JsonResource
             'supplier' => new SupplierResource($this->whenLoaded('supplier')),
             'order_item' => $this->whenPivotLoaded('order_items', function () {
                 return [
-                    'sold_at_price' => (float) $this->pivot->price,
+                    'sold_at_price' => $this->pivot->price,
                     'quantity' => $this->pivot->quantity,
                 ];
             }),
