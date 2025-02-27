@@ -3,86 +3,66 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use App\Http\Requests\DestroyProductRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(): JsonResource
     {
-        return Product::with('supplier')->get();
+        return ProductResource::collection(Product::all());
     }
 
-    public function show($id)
+    public function show(Product $product): ProductResource
     {
-        $product = Product::with('supplier')->findOrFail($id);
-
-        return response()->json($product);
+        return new ProductResource($product);
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request): ProductResource
     {
-        if ($request->user()->role !== 'supplier') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $validated = $request->validated();
 
         $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
+        if ($validated->hasFile('image')) {
+            $imagePath = $validated->file('image')->store('images', 'public');
         }
 
         $product = Product::create([
             'supplier_id' => Auth::id(),
-            'name' => $request->name,
-            'price' => $request->price,
-            'description' => $request->description,
+            'name' => $validated['name'],
+            'price' => $validated['price'],
+            'description' => $validated['description'],
             'image' => $imagePath,
         ]);
 
-        return response()->json($product, 201);
+        return new ProductResource($product);
     }
 
-    public function update(Request $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product): ProductResource
     {
-        if ($request->user()->role !== 'supplier') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $validated = $request->validated();
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        if ($request->hasFile('image')) {
+        if ($validated->hasFile('image')) {
             if ($product->image) {
                 Storage::delete($product->image);
             }
-            $product->image = $request->file('image')->store('images', 'public');
+
+            $product->image = $validated->file('image')->store('images', 'public');
         }
 
-        $product->update($request->only('name', 'price', 'description'));
+        $product->update($validated->only('name', 'price', 'description'));
 
-        return response()->json($product);
+        return new ProductResource($product);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(DestroyProductRequest $request, Product $product): JsonResponse
     {
-        if ($request->user()->role !== 'supplier') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $product = Product::findOrFail($id);
-
         if ($product->image) {
             Storage::delete($product->image);
         }

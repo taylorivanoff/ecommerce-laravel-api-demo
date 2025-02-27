@@ -13,6 +13,8 @@ class Product extends Model
 
     protected $appends = ['image_url'];
 
+    protected $with = ['supplier'];
+
     protected function imageUrl(): Attribute
     {
         return Attribute::get(fn() => $this->image ? asset('storage/' . $this->image) : null);

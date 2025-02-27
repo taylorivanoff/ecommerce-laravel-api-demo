@@ -26,11 +26,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/remove', [CartController::class, 'remove']);
     });
 
-    Route::post('/products', [ProductController::class, 'store']);
-    Route::post('/products/{product}', [ProductController::class, 'update']);
-    Route::delete('/products/{product}', [ProductController::class, 'destroy']);
-
     Route::prefix('supplier')->group(function () {
+        Route::post('/products', [ProductController::class, 'store']);
+        Route::post('/products/{product}', [ProductController::class, 'update']);
+        Route::delete('/products/{product}', [ProductController::class, 'destroy']);
+
         Route::get('/products', [SupplierController::class, 'products']);
         Route::get('/orders', [SupplierController::class, 'orders']);
     });

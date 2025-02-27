@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class SupplierController extends Controller
 {
@@ -29,7 +27,6 @@ class SupplierController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        // Calculate supplier_amount for each order
         $products->each(function ($product) use ($user) {
             $product->orders->each(function ($order) use ($user) {
                 $order->supplier_amount = $order->items
