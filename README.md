@@ -55,10 +55,16 @@ This is the backend part of the Squeak Boutique e-commerce store, built using La
 5. Run migrations:
 
     ```bash
-    php artisan migrate
+    php artisan migrate --seed
     ```
 
-6. Start the server:
+6. Link storage:
+
+    ```bash
+    php artisan storage:link
+    ```
+
+7. Start the server:
     ```bash
     php artisan serve
     ```
