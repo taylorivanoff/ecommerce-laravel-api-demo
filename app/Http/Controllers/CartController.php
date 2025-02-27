@@ -2,76 +2,76 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Cart;
-use App\Models\Product;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\CartResource;
+use App\Http\Requests\AddCartRequest;
+use App\Http\Requests\RemoveCartRequest;
+use App\Http\Resources\CartItemResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class CartController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): JsonResource
     {
-        $cartItems = Cart::where('user_id', $request->user()->id)->with('product.supplier')->get();
+        $cart = Cart::where('user_id', $request->user()->id)
+            ->with('product.supplier')
+            ->get();
 
-        return response()->json($cartItems, 200);
+        return CartItemResource::collection($cart);
     }
 
-    public function add(Request $request)
+    public function add(AddCartRequest $request): CartItemResource
     {
-        $validatedData = $request->validate([
-            'product_id' => 'required|integer|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $user = $request->user();
 
         $cartItem = Cart::where('user_id', $user->id)
-            ->where('product_id', $validatedData['product_id'])
+            ->where('product_id', $validated['product_id'])
             ->first();
 
-        if ($cartItem) {
-            $cartItem->quantity += $validatedData['quantity'];
-
-            $cartItem->save();
-
-            return response()->json(['message' => 'Cart updated successfully.', 'cart_item' => $cartItem], 200);
-        } else {
+        if (!$cartItem) {
             $cartItem = Cart::create([
                 'user_id' => $user->id,
-                'product_id' => $validatedData['product_id'],
-                'quantity' => $validatedData['quantity'],
+                'product_id' => $validated['product_id'],
+                'quantity' => $validated['quantity'],
             ]);
-
-            return response()->json(['message' => 'Item added to cart successfully.', 'cart_item' => $cartItem], 201);
         }
+
+        $cartItem->quantity += $validated['quantity'];
+
+        $cartItem->save();
+
+        return new CartItemResource($cartItem);
     }
 
-    public function remove(Request $request)
+    public function remove(RemoveCartRequest $request)
     {
-        $validatedData = $request->validate([
-            'product_id' => 'required|integer|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $user = $request->user();
 
         $cartItem = Cart::where('user_id', $user->id)
-            ->where('product_id', $validatedData['product_id'])
+            ->where('product_id', $validated['product_id'])
             ->first();
 
-        if ($cartItem) {
-            $cartItem->quantity -= $validatedData['quantity'];
-
-            if ($cartItem->quantity <= 0) {
-                $cartItem->delete();
-                return response()->json(['message' => 'Item removed from cart successfully.'], 200);
-            } else {
-                $cartItem->save();
-                return response()->json(['message' => 'Cart updated successfully.', 'cart_item' => $cartItem], 200);
-            }
-        } else {
-            return response()->json(['message' => 'Cart item not found.'], 404);
+        if (!$cartItem) {
+            throw new ModelNotFoundException('Cart item not found');
         }
+
+        $cartItem->quantity -= $validated['quantity'];
+
+        if ($cartItem->quantity <= 0) {
+            $cartItem->delete();
+
+            return response()->json(null, 204);
+        }
+
+        $cartItem->save();
+
+        return new CartItemResource($cartItem);
     }
 }
