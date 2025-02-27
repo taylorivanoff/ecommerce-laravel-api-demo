@@ -4,6 +4,8 @@
 
 This is the backend part of the Squeak Boutique e-commerce store, built using Laravel. It provides APIs for user authentication, product management, and order processing.
 
+[Demo](https://squeak-boutique.netlify.app/supplier/login)
+
 ## Features
 
 -   User authentication with Laravel Sanctum
@@ -14,7 +16,6 @@ This is the backend part of the Squeak Boutique e-commerce store, built using La
 ## Technologies Used
 
 -   **PHP** (Laravel)
--   **SQLite** (or MySQL/PostgreSQL)
 -   **Composer** for dependency management
 
 ## Getting Started
