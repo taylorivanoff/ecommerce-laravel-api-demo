@@ -3,21 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginUserRequest;
+use App\Http\Requests\RegisterUserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterUserRequest $request): UserResource
     {
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|min:6',
-            'role' => 'required|in:customer,supplier',
-        ]);
+        $validated = $request->validated();
 
         $user = User::create([
             'name' => $validated['name'],
@@ -26,33 +25,25 @@ class AuthController extends Controller
             'role' => $validated['role'],
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json(['user' => $user, 'token' => $token]);
+        return new UserResource($user, $user->createToken('auth_token')->plainTextToken);
     }
 
-    public function login(Request $request)
+    public function login(LoginUserRequest $request): UserResource
     {
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-            'role' => 'required|in:customer,supplier',
-        ]);
-
-        $user = User::where('email', $validated['email'])->where('role', $validated['role'])->first();
-
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
-            throw ValidationException::withMessages(['email' => 'Invalid credentials']);
+        if (!Auth::attempt($request->validated())) {
+            throw new AuthenticationException('Invalid credentials');
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $user = Auth::user();
 
-        return response()->json(['user' => $user, 'token' => $token]);
+        return new UserResource($user, $user->createToken('auth_token')->plainTextToken);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
-        $request->user()->tokens()->delete();
+        $user = Auth::user();
+
+        $user->tokens()->delete();
 
         return response()->json(['message' => 'Logged out']);
     }
