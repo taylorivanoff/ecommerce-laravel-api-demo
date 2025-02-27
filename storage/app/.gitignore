@@ -1,4 +1,7 @@
 *
 !private/
 !public/
+!public/images
+!public/images/batrat.png
+!public/images/pumpkin-pie.png
 !.gitignore
