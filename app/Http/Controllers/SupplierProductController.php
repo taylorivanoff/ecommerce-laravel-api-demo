@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SupplierProductResource;
 use Illuminate\Http\Request;
 
 class SupplierProductController extends Controller
@@ -10,6 +11,6 @@ class SupplierProductController extends Controller
     {
         $products = $request->user()->products()->get();
 
-        return response()->json($products, 200);
+        return SupplierProductResource::collection($products);
     }
 }
