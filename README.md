@@ -1,14 +1,8 @@
-# Squeak Boutique - API
+# ecommerce-laravel-api-demo
 
 ## Overview
 
-This is the backend part of the Squeak Boutique e-commerce store, built using Laravel. It provides APIs for user authentication, product management, and order processing.
-
-[Demo](https://squeak-boutique.netlify.app/)
-
-Demo Supplier Logins:
-- fancy@ratwear.com, password
-- runway@rodent.com, password
+This is the backend part of the e-commerce store, built using Laravel. It provides APIs for user authentication, product management, and order processing.
 
 ## Features
 
@@ -35,13 +29,13 @@ Demo Supplier Logins:
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/taylorivanoff/squeak-boutique-ecommerce-api.git
+    git clone https://github.com/taylorivanoff/ecommerce-laravel-api-demo.git
     ```
 
 2. Navigate to the backend directory:
 
     ```bash
-    cd squeak-boutique-ecommerce-api
+    cd ecommerce-laravel-api-demo
     ```
 
 3. Install dependencies:
