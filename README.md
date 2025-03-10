@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is the backend part of the e-commerce store, built using Laravel. It provides APIs for user authentication, product management, and order processing.
+Backend API of an e-commerce store, made with Laravel. It provides APIs for user authentication, product management, and order processing.
 
 ## Features
 
